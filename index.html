@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]>    <html class="no-js iem7"> <![endif]-->
+<!--[if (gt IEMobile 7)|!(IEMobile)]><!--> <html class="no-js"> <!--<![endif]-->
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="description" content="">
+		<meta name="HandheldFriendly" content="True">
+		<meta name="MobileOptimized" content="320">
+		<meta name="viewport" content="minimum-scale=1.0, maximum-scale=1.0, width=device-width, user-scalable=no">
+		<meta http-equiv="cleartype" content="on">
+
+		<link rel="apple-touch-icon-precomposed" sizes="144x144" href="img/touch/apple-touch-icon-144x144-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" sizes="114x114" href="img/touch/apple-touch-icon-114x114-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" sizes="72x72" href="img/touch/apple-touch-icon-72x72-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" href="img/touch/apple-touch-icon-57x57-precomposed.png">
+		<link rel="shortcut icon" href="img/touch/apple-touch-icon.png">
+
+		<!-- Tile icon for Win8 (144x144 + tile color) -->
+		<meta name="msapplication-TileImage" content="img/touch/apple-touch-icon-144x144-precomposed.png">
+		<meta name="msapplication-TileColor" content="#222222">
+
+
+		<!-- For iOS web apps. Delete if not needed. https://github.com/h5bp/mobile-boilerplate/issues/94 -->
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="apple-mobile-web-app-title" content="">
+
+		<!-- This script prevents links from opening in Mobile Safari. https://gist.github.com/1042026 -->
+		<!--
+		<script>(function(a,b,c){if(c in b&&b[c]){var d,e=a.location,f=/^(a|html)$/i;a.addEventListener("click",function(a){d=a.target;while(!f.test(d.nodeName))d=d.parentNode;"href"in d&&(d.href.indexOf("http")||~d.href.indexOf(e.host))&&(a.preventDefault(),e.href=d.href)},!1)}})(document,window.navigator,"standalone")</script>
+		-->
+
+		<link rel="stylesheet" href="css/normalize.css">
+		<link rel="stylesheet" href="css/main.css">
+		<script src="js/vendor/modernizr-2.6.2.min.js"></script>
+	</head>
+	<body>
+		<div id="picture-frame" class="swipe-element" ontouchstart="touchStart(event,'picture-frame');" ontouchend="touchEnd(event);" ontouchmove="touchMove(event);" ontouchcancel="touchCancel(event);" style="position:absolute;z-index:1;width:100%;height:100%;background-image:url('photos/1.jpg');background-repeat:no-repeat;">
+			<!-- for faster response, load the images into memory by adding them to the page without displaying them -->
+			<img src="photos/1.jpg" width="1024" height="768" style="display:none;">
+			<img src="photos/2.jpg" width="1024" height="768" style="display:none;">
+			<img src="photos/3.jpg" width="1024" height="768" style="display:none;">
+			<img src="photos/4.jpg" width="1024" height="768" style="display:none;">
+			<img src="photos/5.jpg" width="1024" height="768" style="display:none;">
+			<img src="photos/6.jpg" width="1024" height="768" style="display:none;">
+			<img src="photos/7.jpg" width="1024" height="768" style="display:none;">
+			<img src="photos/8.jpg" width="1024" height="768" style="display:none;">
+		</div>
+		<script type="text/javascript">
+			// TOUCH-EVENTS SINGLE-FINGER SWIPE-SENSING JAVASCRIPT
+			// Courtesy of PADILICIOUS.COM and MACOSXAUTOMATION.COM
+			
+			// this script can be used with one or more page elements to perform actions based on them being swiped with a single finger
+		
+			var triggerElementID = null; // this variable is used to identity the triggering element
+			var fingerCount = 0;
+			var startX = 0;
+			var startY = 0;
+			var curX = 0;
+			var curY = 0;
+			var deltaX = 0;
+			var deltaY = 0;
+			var horzDiff = 0;
+			var vertDiff = 0;
+			var minLength = 72; // the shortest distance the user may swipe
+			var swipeLength = 0;
+			var swipeAngle = null;
+			var swipeDirection = null;
+			
+			// The 4 Touch Event Handlers
+			
+			// NOTE: the touchStart handler should also receive the ID of the triggering element
+			// make sure its ID is passed in the event call placed in the element declaration, like:
+			// <div id="picture-frame" ontouchstart="touchStart(event,'picture-frame');"  ontouchend="touchEnd(event);" ontouchmove="touchMove(event);" ontouchcancel="touchCancel(event);">
+			
+			function touchStart(event,passedName) {
+				// disable the standard ability to select the touched object
+				event.preventDefault();
+				// get the total number of fingers touching the screen
+				fingerCount = event.touches.length;
+				// since we're looking for a swipe (single finger) and not a gesture (multiple fingers),
+				// check that only one finger was used
+				if ( fingerCount == 1 ) {
+					// get the coordinates of the touch
+					startX = event.touches[0].pageX;
+					startY = event.touches[0].pageY;
+					// store the triggering element ID
+					triggerElementID = passedName;
+				} else {
+					// more than one finger touched so cancel
+					touchCancel(event);
+				}
+			}
+		
+			function touchMove(event) {
+				event.preventDefault();
+				if ( event.touches.length == 1 ) {
+					curX = event.touches[0].pageX;
+					curY = event.touches[0].pageY;
+				} else {
+					touchCancel(event);
+				}
+			}
+			
+			function touchEnd(event) {
+				event.preventDefault();
+				// check to see if more than one finger was used and that there is an ending coordinate
+				if ( fingerCount == 1 && curX != 0 ) {
+					// use the Distance Formula to determine the length of the swipe
+					swipeLength = Math.round(Math.sqrt(Math.pow(curX - startX,2) + Math.pow(curY - startY,2)));
+					// if the user swiped more than the minimum length, perform the appropriate action
+					if ( swipeLength >= minLength ) {
+						caluculateAngle();
+						determineSwipeDirection();
+						processingRoutine();
+						touchCancel(event); // reset the variables
+					} else {
+						touchCancel(event);
+					}	
+				} else {
+					touchCancel(event);
+				}
+			}
+		
+			function touchCancel(event) {
+				// reset the variables back to default values
+				fingerCount = 0;
+				startX = 0;
+				startY = 0;
+				curX = 0;
+				curY = 0;
+				deltaX = 0;
+				deltaY = 0;
+				horzDiff = 0;
+				vertDiff = 0;
+				swipeLength = 0;
+				swipeAngle = null;
+				swipeDirection = null;
+				triggerElementID = null;
+			}
+			
+			function caluculateAngle() {
+				var X = startX-curX;
+				var Y = curY-startY;
+				var Z = Math.round(Math.sqrt(Math.pow(X,2)+Math.pow(Y,2))); //the distance - rounded - in pixels
+				var r = Math.atan2(Y,X); //angle in radians (Cartesian system)
+				swipeAngle = Math.round(r*180/Math.PI); //angle in degrees
+				if ( swipeAngle < 0 ) { swipeAngle =  360 - Math.abs(swipeAngle); }
+			}
+			
+			function determineSwipeDirection() {
+				if ( (swipeAngle <= 45) && (swipeAngle >= 0) ) {
+					swipeDirection = 'left';
+				} else if ( (swipeAngle <= 360) && (swipeAngle >= 315) ) {
+					swipeDirection = 'left';
+				} else if ( (swipeAngle >= 135) && (swipeAngle <= 225) ) {
+					swipeDirection = 'right';
+				} else if ( (swipeAngle > 45) && (swipeAngle < 135) ) {
+					swipeDirection = 'down';
+				} else {
+					swipeDirection = 'up';
+				}
+			}
+			
+			function processingRoutine() {
+				var swipedElement = document.getElementById(triggerElementID);
+				if ( swipeDirection == 'left' ) {
+					prevImage();
+					// REPLACE WITH YOUR ROUTINES
+					//swipedElement.style.backgroundColor = 'orange';
+				} else if ( swipeDirection == 'right' ) {
+					nextImage();
+					// REPLACE WITH YOUR ROUTINES
+					//swipedElement.style.backgroundColor = 'green';
+				} else if ( swipeDirection == 'up' ) {
+					// REPLACE WITH YOUR ROUTINES
+					//swipedElement.style.backgroundColor = 'maroon';
+				} else if ( swipeDirection == 'down' ) {
+					// REPLACE WITH YOUR ROUTINES
+					//swipedElement.style.backgroundColor = 'purple';
+				}
+			}
+
+			// images are assumed to be named in this format "X.jpg" where X is a number within the count of images
+			// images are assumed to be in a folder named "photos" placed at the same level as this file
+			function nextImage() {
+				var currentValue = document.getElementById(triggerElementID).style.backgroundImage;
+				var fileBaseName = findBaseName(currentValue);
+				var currentNum = Number(fileBaseName);
+				if ( currentNum == photoCount ) {
+	   				var nextNum = 1;
+				} else {
+	   				var nextNum = currentNum + 1;
+				};
+				var nextName = String(nextNum) + '.jpg';
+				document.getElementById(triggerElementID).style.backgroundImage = "url('photos/" + nextName + "')";
+			}
+
+			function prevImage() {
+				var currentValue = document.getElementById(triggerElementID).style.backgroundImage;
+				var fileBaseName = findBaseName(currentValue);
+				var currentNum = Number(fileBaseName);
+				if (currentNum == 1) {
+	   				var nextNum = photoCount;
+				} else {
+	   				var nextNum = currentNum - 1;
+				};
+				var nextName = String(nextNum) + '.jpg';
+				document.getElementById(triggerElementID).style.backgroundImage = "url('photos/" + nextName + "')";
+			}
+			
+			function findBaseName(url) {
+				var fileName = url.substring(url.lastIndexOf('/') + 1);
+				var dot = fileName.lastIndexOf('.');
+				return dot == -1 ? fileName : fileName.substring(0, dot);
+			}
+		</script>
+		<script src="js/vendor/zepto.min.js"></script>
+		<script src="js/helper.js"></script>
+
+		<!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+		<script>
+			var _gaq=[["_setAccount","UA-XXXXX-X"],["_trackPageview"]];
+			(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
+			g.src=("https:"==location.protocol?"//ssl":"//www")+".google-analytics.com/ga.js";
+			s.parentNode.insertBefore(g,s)}(document,"script"));
+		</script>
+	</body>
+</html>
