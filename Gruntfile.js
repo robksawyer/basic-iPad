@@ -15,7 +15,7 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				src: ['build/js/vendor/{,*/}*.js'],
-				dest: 'build/js/vendor.js'
+				dest: './tmp/vendor.js'
 			}
 		},
 		uglify: {
@@ -38,24 +38,37 @@ module.exports = function(grunt) {
 				loopfunc: false,
 				globals: {
 					jQuery: true,
-					console: true,
-					module: true,
-					document: true
+					document: true,
+					window: true
 				}
 			},
-			files: ['Gruntfile.js', 'build/{,*/}*.js', 'test/**/*.js']
+			all: [
+				'Gruntfile.js', 
+				'build/js/{,*/}*.js',
+				'!build/js/helper.js',
+				'!build/js/plugins.js',
+				'!build/js/vendor/*',
+				'test/**/*.js'
+			]
 		},
 		copy: {
 			dist: {
-				files: [
-					{expand: true, src: ['<% config.build %>/img/**'], dest: '<% config.dist %>/'},
-					//{expand: true, src: ['<% config.build %>/js/**'], dest: '<% config.dist %>/'},
-					{expand: true, src: ['<% config.build %>/js/vendor/**'], dest: '<% config.dist %>/js/'},
-					{expand: true, src: ['<% config.build %>/js/<%= pkg.name %>.js'], dest: '<% config.dist %>/js/', filter: 'isFile'},
-					{expand: true, src: ['<% config.build %>/tools/**'], dest: '<% config.dist %>/'},
-					{expand: true, src: ['<% config.build %>/css/**'], dest: '<% config.dist %>/'},
-					{expand: true, src: ['<% config.build %>/{,*/}*.{html,js,txt,xml,ico}'], dest: '<% config.dist %>/', filter: 'isFile'}
-				]
+				files: [{
+						expand: true, 
+						cwd: '<%= config.build %>',
+						dest: '<%= config.dist %>',
+						src: [
+							'*.{ico,txt,xml}',
+							'.htaccess',
+							'*.{html,js}',
+							'img/**',
+							'js/*.js',
+							'js/vendor/vendor.min.js',
+							//'js/<%= pkg.name %>.js',
+							'tools/**',
+							'css/**'
+						]
+				}]
 			}
 		},
 		watch: {
@@ -73,6 +86,6 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('test', ['jshint']);
 
-	grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'copy']);
+	grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'copy:dist']);
 
 };
